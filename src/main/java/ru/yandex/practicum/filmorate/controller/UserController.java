@@ -14,6 +14,7 @@ import java.util.List;
 public class UserController {
     private static int id = 0;
     List<User> users = new ArrayList<>();
+
     @PostMapping("/users")
     public User createUser(@Valid @RequestBody User user) throws ValidationException {
         isValidUser(user);
