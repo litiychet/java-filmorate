@@ -1,45 +1,46 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Marker;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
 public class FilmController {
-    private static int id = 0;
-    private List<Film> films = new ArrayList<>();
+    private static Long id = 0L;
+    private Map<Long, Film> films = new HashMap<>();
 
     @PostMapping("/films")
-    public Film createFilm(@Valid @RequestBody Film film) throws ValidationException {
-        isValidFilm(film);
+    @Validated({Marker.Create.class})
+    public Film createFilm(@Valid @RequestBody Film film) {
+        isValidReleaseDateFilm(film);
         film.setId(++id);
-        films.add(film);
+        films.put(id, film);
         log.info("Добавлен фильм: {}", film);
         return film;
     }
 
     @PutMapping("/films")
-    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
-        Integer filmId = film.getId();
+    @Validated({Marker.Update.class})
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        isValidReleaseDateFilm(film);
 
-        if (filmId == null || filmId <= 0)
-            throw new ValidationException("Некорректный ID");
+        Long newFilmId = film.getId();
 
-        isValidFilm(film);
-
-        for (Film f : films) {
-            if (f.getId() == filmId) {
-                films.remove(f);
-                films.add(film);
-                log.info("Обновлен фильм: {} на {}", f, film);
-                return film;
-            }
+        if (films.containsKey(newFilmId)) {
+            Film replacedFilm = films.get(newFilmId);
+            films.put(newFilmId, film);
+            log.info("Обновлен фильм: {} на {}", replacedFilm, film);
+            return film;
         }
 
         throw new ValidationException("Такого фильма нет");
@@ -47,17 +48,12 @@ public class FilmController {
 
     @GetMapping("/films")
     public List<Film> getFilms() {
-        return films;
+        List<Film> filmsList = new ArrayList<>(films.values());
+        return filmsList;
     }
 
-    private void isValidFilm(Film film) throws ValidationException {
-        if (film.getDescription().length() > 200)
-            throw new ValidationException("Описание более 200 символов");
-
+    private void isValidReleaseDateFilm(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28)))
             throw new ValidationException("Дата релиза фильма не может быть раньше 28.12.1895");
-
-        if (film.getDuration() < 0)
-            throw new ValidationException("Продолжительность фильма отрицательная");
     }
 }
