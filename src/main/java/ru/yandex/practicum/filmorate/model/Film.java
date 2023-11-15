@@ -12,12 +12,12 @@ public class Film {
     @NotNull(groups = Marker.Update.class)
     private Long id;
     @NotBlank
-    private final String name;
+    private String name;
     @Size(min = 0, max = 200)
-    private final String description;
+    private String description;
     @NotNull
-    private final LocalDate releaseDate;
+    private LocalDate releaseDate;
     @NotNull
     @Min(1)
-    private final Integer duration;
+    private Integer duration;
 }

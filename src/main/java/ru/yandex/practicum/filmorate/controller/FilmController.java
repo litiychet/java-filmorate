@@ -21,7 +21,7 @@ public class FilmController {
 
     @PostMapping("/films")
     @Validated({Marker.Create.class})
-    public Film createFilm(@Valid @RequestBody Film film) {
+    public Film createFilm(@RequestBody Film film) {
         isValidReleaseDateFilm(film);
         film.setId(++id);
         films.put(id, film);
@@ -31,7 +31,7 @@ public class FilmController {
 
     @PutMapping("/films")
     @Validated({Marker.Update.class})
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@RequestBody Film film) {
         isValidReleaseDateFilm(film);
 
         Long newFilmId = film.getId();

@@ -12,12 +12,12 @@ public class User {
     private Long id;
     @Email
     @NotEmpty
-    private final String email;
+    private String email;
     @NotNull
     @NotBlank
-    private final String login;
+    private String login;
     private String name;
     @NotNull
     @Past
-    private final LocalDate birthday;
+    private LocalDate birthday;
 }

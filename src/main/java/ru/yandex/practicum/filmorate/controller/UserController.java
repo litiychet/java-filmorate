@@ -20,7 +20,7 @@ public class UserController {
 
     @PostMapping("/users")
     @Validated({Marker.Create.class})
-    public User createUser(@Valid @RequestBody User user) {
+    public User createUser(@RequestBody User user) {
         isValidUser(user);
 
         String username = user.getName();
@@ -36,7 +36,7 @@ public class UserController {
 
     @PutMapping("/users")
     @Validated({Marker.Update.class})
-    public User updateUser(@Valid @RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         isValidUser(user);
 
         String username = user.getName();
