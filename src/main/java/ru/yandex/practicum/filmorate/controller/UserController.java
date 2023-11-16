@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,53 +18,56 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class UserController {
-    private static Long id = 0L;
-    Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/users")
     @Validated({Marker.Create.class})
     public User createUser(@RequestBody User user) {
-        isValidUser(user);
-
-        String username = user.getName();
-        if (username == null || username.isEmpty() || username.isBlank())
-            user.setName(user.getLogin());
-
-        user.setId(++id);
-        users.put(id, user);
+        userService.createUser(user);
         log.info("Добавлен польозватель: {}", user);
-
         return user;
     }
 
     @PutMapping("/users")
     @Validated({Marker.Update.class})
     public User updateUser(@RequestBody User user) {
-        isValidUser(user);
-
-        String username = user.getName();
-        if (username == null || username.isEmpty() || username.isBlank())
-            user.setName(user.getLogin());
-
-        Long newUserId = user.getId();
-        if (users.containsKey(newUserId)) {
-            User replacedUser = users.get(newUserId);
-            users.put(newUserId, user);
-            log.info("Изменен пользователь: {} на {}", replacedUser, user);
-            return user;
-        }
-
-        throw new ValidationException("Такого пользователя нет");
+        userService.updateUser(user);
+        //log.info("Изменен пользователь: {} на {}", replacedUser, user);
+        return user;
     }
 
     @GetMapping("/users")
     public List<User> getUsers() {
-        List<User> usersList = new ArrayList<>(users.values());
-        return usersList;
+        return userService.getUsers();
     }
 
-    private void isValidUser(User user) {
-        if (user.getLogin().contains(" "))
-            throw new ValidationException("Логин содержит пробел");
+    @GetMapping("/users/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/users/{id}/friends")
+    public List<User> getUserFriends(@PathVariable Long id) {
+        return userService.getUserFriends(id);
+    }
+
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<User> getCommonUsersFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.getCommonFriendsList(id, otherId);
     }
 }
