@@ -31,6 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         Long newFilmId = film.getId();
 
+
         if (films.containsKey(newFilmId)) {
             Film replacedFilm = films.get(newFilmId);
             films.put(newFilmId, film);

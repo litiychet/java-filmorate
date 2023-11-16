@@ -38,6 +38,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (username == null || username.isEmpty() || username.isBlank())
             user.setName(user.getLogin());
 
+
         Long newUserId = user.getId();
         if (users.containsKey(newUserId)) {
             User replacedUser = users.get(newUserId);
