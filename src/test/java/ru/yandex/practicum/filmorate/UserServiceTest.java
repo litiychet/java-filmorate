@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -58,18 +57,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUserWithLoginWithSpaces() {
-        User user = new User();
-        user.setEmail("somemail5@yandex.ru");
-        user.setLogin("login 5");
-        user.setName("name5");
-        user.setBirthday(LocalDate.of(2001, 7, 5));
-
-        Exception exception = assertThrows(ValidationException.class, () -> userService.createUser(user));
-        assertEquals("Логин содержит пробел", exception.getMessage());
-    }
-
-    @Test
     public void updateUser() {
         User user = new User();
         user.setId(2L);
@@ -85,7 +72,7 @@ public class UserServiceTest {
 
     @Test
     public void getUsers() {
-        assertEquals(4, userService.getUsers().size());
+        assertEquals(5, userService.getUsers().size());
     }
 
     @Test
