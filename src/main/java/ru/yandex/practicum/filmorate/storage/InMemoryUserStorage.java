@@ -14,6 +14,10 @@ public class InMemoryUserStorage implements UserStorage {
     Map<Long, User> users = new HashMap<>();
     Set<String> emails = new HashSet<>();
 
+    public void resetId() {
+        id = 0L;
+    }
+
     @Override
     public User createUser(User user) {
         String username = user.getName();

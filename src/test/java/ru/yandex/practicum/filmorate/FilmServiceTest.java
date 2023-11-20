@@ -23,6 +23,9 @@ public class FilmServiceTest {
 
     @BeforeAll
     public static void setUp() {
+        filmStorage.resetId();
+        userStorage.resetId();
+
         Film film = new Film();
         film.setName("Film name");
         film.setDescription("Description");
