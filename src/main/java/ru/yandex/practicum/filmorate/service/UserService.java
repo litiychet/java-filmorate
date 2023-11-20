@@ -8,32 +8,24 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
 public class UserService {
     private final UserStorage userStorage;
-    private Validator validator;
 
     @Autowired
-    public UserService(UserStorage userStorage, Validator validator) {
+    public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
-        this.validator = validator;
     }
 
     public User createUser(User user) {
-        userValidation(user);
         return userStorage.createUser(user);
     }
 
     public User updateUser(User user) {
-        userValidation(user);
         return userStorage.updateUser(user);
     }
 
@@ -99,16 +91,5 @@ public class UserService {
         }
 
         return commonFriendsList;
-    }
-
-    private void userValidation(User user) {
-        Set<ConstraintViolation<User>> violation = validator.validate(user);
-        if (!violation.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (ConstraintViolation<User> constraintViolation : violation) {
-                sb.append(constraintViolation.getMessage());
-            }
-            throw new ConstraintViolationException("Error occurred: " + sb.toString(), violation);
-        }
     }
 }

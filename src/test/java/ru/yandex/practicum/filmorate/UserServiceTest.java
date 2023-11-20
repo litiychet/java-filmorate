@@ -9,16 +9,13 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     static UserStorage userStorage = new InMemoryUserStorage();
-    static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    static UserService userService = new UserService(userStorage, validator);
+    static UserService userService = new UserService(userStorage);
 
     @BeforeAll
     public static void setUp() {

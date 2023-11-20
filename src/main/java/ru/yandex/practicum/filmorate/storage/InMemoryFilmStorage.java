@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +17,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        isValidReleaseDateFilm(film);
         film.setId(++id);
         films.put(id, film);
         return film;
@@ -27,8 +24,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        isValidReleaseDateFilm(film);
-
         Long newFilmId = film.getId();
 
 
@@ -50,10 +45,5 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilmById(Long id) {
         return films.get(id);
-    }
-
-    private void isValidReleaseDateFilm(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28)))
-            throw new ValidationException("Дата релиза фильма не может быть раньше 28.12.1895");
     }
 }

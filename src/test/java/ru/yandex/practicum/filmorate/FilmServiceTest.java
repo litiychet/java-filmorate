@@ -12,8 +12,6 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,8 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FilmServiceTest {
     static FilmStorage filmStorage = new InMemoryFilmStorage();
     static UserStorage userStorage = new InMemoryUserStorage();
-    static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    static FilmService filmService = new FilmService(filmStorage, userStorage, validator);
+    static FilmService filmService = new FilmService(filmStorage, userStorage);
 
     @BeforeAll
     public static void setUp() {

@@ -2,12 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -21,16 +20,16 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    @Validated({Marker.Create.class})
-    public User createUser(@RequestBody User user) {
+    //@Validated({Marker.Create.class})
+    public User createUser(@Valid @RequestBody User user) {
         userService.createUser(user);
         log.info("Добавлен польозватель: {}", user);
         return user;
     }
 
     @PutMapping("/users")
-    @Validated({Marker.Update.class})
-    public User updateUser(@RequestBody User user) {
+    //@Validated({Marker.Update.class})
+    public User updateUser(@Valid @RequestBody User user) {
         userService.updateUser(user);
         //log.info("Изменен пользователь: {} на {}", replacedUser, user);
         return user;

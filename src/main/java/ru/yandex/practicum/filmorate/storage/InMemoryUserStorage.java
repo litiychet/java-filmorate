@@ -6,43 +6,45 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private static Long id = 0L;
     Map<Long, User> users = new HashMap<>();
+    Set<String> emails = new HashSet<>();
 
     @Override
     public User createUser(User user) {
-        isValidUser(user);
-
         String username = user.getName();
+        String email = user.getEmail();
+
         if (username == null || username.isEmpty() || username.isBlank())
             user.setName(user.getLogin());
+        if (emails.contains(email))
+            throw new ValidationException("Current email exist...");
 
         user.setId(++id);
         users.put(id, user);
+        emails.add(email);
 
         return user;
     }
 
     @Override
     public User updateUser(User user) {
-        isValidUser(user);
-
         String username = user.getName();
+        String email = user.getEmail();
+
         if (username == null || username.isEmpty() || username.isBlank())
             user.setName(user.getLogin());
-
+        if (emails.contains(user.getEmail()))
+            throw new ValidationException("Current email exist...");
 
         Long newUserId = user.getId();
         if (users.containsKey(newUserId)) {
-            User replacedUser = users.get(newUserId);
             users.put(newUserId, user);
+            emails.add(email);
             return user;
         }
 
@@ -58,10 +60,5 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(Long id) {
         return users.get(id);
-    }
-
-    private void isValidUser(User user) {
-        if (user.getLogin().contains(" "))
-            throw new ValidationException("Логин содержит пробел");
     }
 }
