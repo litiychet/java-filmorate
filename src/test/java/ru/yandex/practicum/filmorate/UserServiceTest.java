@@ -40,8 +40,8 @@ public class UserServiceTest {
         userService.createUser(user2);
         userService.createUser(user3);
 
-        userService.addFriend(1L, 2L);
-        userService.addFriend(3L, 2L);
+        userService.addFriend(2L, 3L);
+        userService.addFriend(4L, 3L);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class UserServiceTest {
 
         userService.createUser(user);
 
-        assertEquals("login4", userService.getUserById(4L).getName());
+        assertEquals("login4", userService.getUserById(5L).getName());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class UserServiceTest {
 
     @Test
     public void getUserById() {
-        assertEquals("login3", userService.getUserById(3L).getLogin());
+        assertEquals("login2", userService.getUserById(3L).getLogin());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class UserServiceTest {
 
     @Test
     public void getCommonFriends() {
-        assertFalse(userService.getCommonFriendsList(1L, 3L).isEmpty());
+        assertFalse(userService.getCommonFriendsList(2L, 4L).isEmpty());
     }
 
     @Test

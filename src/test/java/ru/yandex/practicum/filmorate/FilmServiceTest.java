@@ -86,14 +86,14 @@ public class FilmServiceTest {
 
     @Test
     public void addLike() {
-        filmService.addLike(5L, 1L);
+        filmService.addLike(1L, 1L);
 
         assertEquals(1, filmService.getFilmById(1L).getUsersLikes().size());
     }
 
     @Test
     public void removeLike() {
-        filmService.removeLike(5L, 1L);
+        filmService.removeLike(1L, 1L);
 
         assertEquals(0, filmService.getFilmById(1L).getUsersLikes().size());
     }
