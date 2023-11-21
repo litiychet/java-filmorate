@@ -47,6 +47,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         Long newUserId = user.getId();
         if (users.containsKey(newUserId)) {
+            emails.remove(users.get(newUserId).getEmail());
             users.put(newUserId, user);
             emails.add(email);
             return user;

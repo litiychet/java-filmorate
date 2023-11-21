@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Marker;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -20,7 +22,7 @@ public class FilmController {
     }
 
     @PostMapping("/films")
-    //@Validated({Marker.Create.class})
+    @Validated({Marker.Create.class})
     public Film createFilm(@Valid @RequestBody Film film) {
         filmService.createFilm(film);
         log.info("POST /films {}", film);
@@ -29,7 +31,7 @@ public class FilmController {
     }
 
     @PutMapping("/films")
-    //@Validated({Marker.Update.class})
+    @Validated({Marker.Update.class})
     public Film updateFilm(@Valid @RequestBody Film film) {
         filmService.updateFilm(film);
         log.info("PUT /films {}", film);
