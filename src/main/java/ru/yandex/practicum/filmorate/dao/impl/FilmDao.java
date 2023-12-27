@@ -159,7 +159,7 @@ public class FilmDao implements FilmStorage {
         );
 
         rs.next();
-        if(rs.getLong("count") > 0)
+        if (rs.getLong("count") > 0)
             throw new ValidationException("Пользователь с ID "
                     + userId +
                     " уже поставил лайк фильму "
@@ -186,7 +186,7 @@ public class FilmDao implements FilmStorage {
         );
 
         rs.next();
-        if(rs.getLong("count") == 0)
+        if (rs.getLong("count") == 0)
             throw new ValidationException("Пользователь с ID "
                     + userId +
                     " не ставил лайк фильму "
@@ -231,7 +231,7 @@ public class FilmDao implements FilmStorage {
                 film.getId()
         );
 
-        while(genreRs.next()) {
+        while (genreRs.next()) {
             Genre genre = new Genre();
             genre.setId(genreRs.getLong("id"));
             genre.setName(genreRs.getString("name"));
