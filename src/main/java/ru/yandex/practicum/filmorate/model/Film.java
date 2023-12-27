@@ -23,6 +23,9 @@ public class Film {
     @NotNull
     @Min(1)
     private Integer duration;
+    private Rating mpa;
     @Singular
     private Set<Long> usersLikes = new HashSet<>();
+    @Singular
+    private Set<Genre> genres = new HashSet<>();
 }

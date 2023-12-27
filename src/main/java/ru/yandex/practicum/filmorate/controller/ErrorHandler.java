@@ -11,11 +11,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class})
+@RestControllerAdvice(assignableTypes = {FilmController.class, UserController.class, GenreController.class, RatingController.class})
 public class ErrorHandler {
     @ExceptionHandler({ValidationException.class, ConstraintViolationException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handlerUserValidation(final MethodArgumentNotValidException e) {
+    public Map<String, String> handlerUserValidation(final RuntimeException e) {
         return Map.of("error", e.getMessage());
     }
 
@@ -27,7 +27,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> hadlerNotFound(final NotFoundException e) {
+    public Map<String, String> handlerNotFound(final NotFoundException e) {
         return Map.of("error", e.getMessage());
     }
 }
