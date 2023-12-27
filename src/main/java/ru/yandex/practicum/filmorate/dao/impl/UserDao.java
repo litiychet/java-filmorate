@@ -143,7 +143,7 @@ public class UserDao implements UserStorage {
         );
 
         rs.next();
-        if(rs.getLong("count") > 0)
+        if (rs.getLong("count") > 0)
             throw new ValidationException("Пользователь с ID "
                     + userId +
                     " уже отправил запрос дружбы пользователю "
@@ -170,7 +170,7 @@ public class UserDao implements UserStorage {
         );
 
         rs.next();
-        if(rs.getLong("count") == 0)
+        if (rs.getLong("count") == 0)
             throw new ValidationException("У пользователя с ID "
                     + userId +
                     " нет в друзьях пользователя "
