@@ -228,6 +228,7 @@ public class FilmDao implements FilmStorage {
                         "FROM \"film_genre\" AS \"fg\" " +
                         "JOIN \"genre\" AS \"g\" ON \"g\".\"id\" = \"fg\".\"genre_id\" " +
                         "WHERE \"fg\".\"film_id\" = ?",
+
                 film.getId()
         );
 
