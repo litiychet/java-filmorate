@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -19,6 +20,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -63,20 +65,9 @@ public class FilmDao implements FilmStorage {
             return ps;
         }, keyHolder);
 
-        if (!film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                jdbcTemplate.update(
-                        "INSERT INTO \"film_genre\" " +
-                                "(\"film_id\"," +
-                                "\"genre_id\") " +
-                                "VALUES (?, ?)",
-                        keyHolder.getKey(),
-                        genre.getId()
-                        );
-            }
-        }
-
         film.setId(keyHolder.getKey().longValue());
+
+        updateGenre(film);
         film.getMpa().setName(ratingDao.getRatingById(film.getMpa().getId()).getName());
 
         for (Genre genre : film.getGenres()) {
@@ -111,38 +102,56 @@ public class FilmDao implements FilmStorage {
                 film.getId()
         );
 
-        if (!film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                jdbcTemplate.update(
-                        "INSERT INTO \"film_genre\" " +
-                                "(\"film_id\"," +
-                                "\"genre_id\") " +
-                                "VALUES (?, ?)",
-                        film.getId(),
-                        genre.getId()
-                );
-            }
-        }
+        updateGenre(film);
 
         return getFilmById(film.getId());
     }
 
     @Override
     public List<Film> getFilms() {
-        return jdbcTemplate.query(
-                "SELECT * FROM \"films\"",
+        List<Film> films = jdbcTemplate.query(
+            "SELECT \"f\".\"id\"," +
+                    "\"f\".\"name\"," +
+                    "\"f\".\"description\"," +
+                    "\"f\".\"release_date\"," +
+                    "\"f\".\"duration\"," +
+                    "\"f\".\"rating_id\"," +
+                    "\"r\".\"name\" \"rating_name\" " +
+                    "FROM \"films\" \"f\"" +
+                    "JOIN \"rating\" \"r\" ON \"r\".\"id\" = \"f\".\"rating_id\"",
                 (rs, rowNum) -> makeFilm(rs)
         );
+
+        for (Film film : films) {
+            makeGenre(film);
+            makeUserLikes(film);
+        }
+
+        return films;
     }
 
     @Override
     public Film getFilmById(Long id) {
         try {
-            return jdbcTemplate.query(
-                    "SELECT * FROM \"films\" WHERE \"id\" = ?",
+            Film film = jdbcTemplate.query(
+                    "SELECT \"f\".\"id\"," +
+                            "\"f\".\"name\"," +
+                            "\"f\".\"description\"," +
+                            "\"f\".\"release_date\"," +
+                            "\"f\".\"duration\"," +
+                            "\"f\".\"rating_id\"," +
+                            "\"r\".\"name\" AS \"rating_name\" " +
+                            "FROM \"films\" AS \"f\" " +
+                            "JOIN \"rating\" AS \"r\" ON \"r\".\"id\" = \"f\".\"rating_id\" " +
+                            "WHERE \"f\".\"id\" = ?",
                     (rs, rowNum) -> makeFilm(rs),
                     id
             ).get(0);
+
+            makeGenre(film);
+            makeUserLikes(film);
+
+            return film;
         } catch (IndexOutOfBoundsException e) {
             return null;
         }
@@ -203,6 +212,7 @@ public class FilmDao implements FilmStorage {
 
     private Film makeFilm(ResultSet rs) throws SQLException {
         Film film = new Film();
+        Rating rating = new Rating();
 
         film.setId(rs.getLong("id"));
         film.setName(rs.getString("name"));
@@ -210,19 +220,41 @@ public class FilmDao implements FilmStorage {
         film.setDuration(rs.getInt("duration"));
         film.setReleaseDate(rs.getDate("release_date").toLocalDate());
 
-        SqlRowSet ratingRs = jdbcTemplate.queryForRowSet(
-                "SELECT * FROM \"rating\" WHERE \"id\" = ?",
-                rs.getLong("rating_id")
-        );
+        rating.setId(rs.getLong("rating_id"));
+        rating.setName(rs.getString("rating_name"));
 
-        if (ratingRs.next()) {
-            Rating rating = new Rating();
-            rating.setId(ratingRs.getLong("id"));
-            rating.setName(ratingRs.getString("name"));
+        film.setMpa(rating);
 
-            film.setMpa(rating);
+        return film;
+    }
+
+    private void updateGenre(Film film) {
+        List<Genre> genres = new ArrayList<>(film.getGenres());
+
+        if (!genres.isEmpty()) {
+            jdbcTemplate.batchUpdate(
+                    "INSERT INTO \"film_genre\" " +
+                            "(\"film_id\"," +
+                            "\"genre_id\") " +
+                            "VALUES (?, ?)",
+                    new BatchPreparedStatementSetter() {
+                        @Override
+                        public void setValues(PreparedStatement ps, int i) throws SQLException {
+                            Genre genre = genres.get(i);
+                            ps.setLong(1, film.getId());
+                            ps.setLong(2, genre.getId());
+                        }
+
+                        @Override
+                        public int getBatchSize() {
+                            return genres.size();
+                        }
+                    }
+            );
         }
+    }
 
+    private void makeGenre(Film film) {
         SqlRowSet genreRs = jdbcTemplate.queryForRowSet(
                 "SELECT \"g\".\"id\", \"g\".\"name\" " +
                         "FROM \"film_genre\" AS \"fg\" " +
@@ -239,8 +271,9 @@ public class FilmDao implements FilmStorage {
 
             film.getGenres().add(genre);
         }
+    }
 
-
+    private void makeUserLikes(Film film) {
         SqlRowSet likesRs = jdbcTemplate.queryForRowSet(
                 "SELECT * FROM \"film_likes\" " +
                         "WHERE \"film_id\" = ?",
@@ -250,7 +283,5 @@ public class FilmDao implements FilmStorage {
         while (likesRs.next()) {
             film.getUsersLikes().add(likesRs.getLong("user_id"));
         }
-
-        return film;
     }
 }

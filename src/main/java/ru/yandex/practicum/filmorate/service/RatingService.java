@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class RatingService {
-    private RatingDao ratingDao;
+    private final RatingDao ratingDao;
 
     @Autowired
     public RatingService(RatingDao ratingDao) {
