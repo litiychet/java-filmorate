@@ -24,19 +24,17 @@ public class FilmController {
     @PostMapping("/films")
     @Validated({Marker.Create.class})
     public Film createFilm(@Valid @RequestBody Film film) {
-        filmService.createFilm(film);
         log.info("POST /films {}", film);
         log.info("Add film {}", film);
-        return film;
+        return filmService.createFilm(film);
     }
 
     @PutMapping("/films")
     @Validated({Marker.Update.class})
     public Film updateFilm(@Valid @RequestBody Film film) {
-        filmService.updateFilm(film);
         log.info("PUT /films {}", film);
         log.info("Update film {}", film);
-        return film;
+        return filmService.updateFilm(film);
     }
 
     @GetMapping("/films")

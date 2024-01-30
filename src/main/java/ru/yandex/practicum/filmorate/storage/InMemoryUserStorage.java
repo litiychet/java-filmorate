@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -9,10 +10,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 
 @Component
+@Qualifier("memoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     private static Long id = 0L;
-    Map<Long, User> users = new HashMap<>();
-    Set<String> emails = new HashSet<>();
+    private Map<Long, User> users = new HashMap<>();
+    private Set<String> emails = new HashSet<>();
 
     public void resetId() {
         id = 0L;
@@ -65,5 +67,19 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(Long id) {
         return users.get(id);
+    }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+        if (getUserById(userId).getFriendsList().contains(friendId))
+            throw new ValidationException("Пользователь с ID " + userId + " уже отправил запрос дружбы пользователю " + friendId);
+        getUserById(userId).getFriendsList().add(friendId);
+    }
+
+    @Override
+    public void removeFriend(Long userId, Long friendId) {
+        if (!getUserById(userId).getFriendsList().contains(friendId))
+            throw new ValidationException("У пользователя с ID " + userId + " нет в друзьях пользователя " + friendId);
+        getUserById(userId).getFriendsList().remove(friendId);
     }
 }

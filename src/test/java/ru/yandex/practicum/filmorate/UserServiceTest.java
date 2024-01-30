@@ -84,7 +84,7 @@ public class UserServiceTest {
 
     @Test
     public void addFriend() {
-        userService.addFriend(2L, 3L);
+        userService.addFriend(2L, 1L);
         assertFalse(userService.getUserFriends(2L).isEmpty());
     }
 
